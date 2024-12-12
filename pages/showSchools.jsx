@@ -9,7 +9,7 @@ export default function ShowSchools() {
   useEffect(() => {
     async function fetchSchools() {
       try {
-        const response = await axios.get("/api/getSchools");
+        const response = await axios.get("https://schools-management.netlify.app/api/getSchools");
         setSchools(response.data);
       } catch (error) {
         console.error("Error fetching schools data:", error);

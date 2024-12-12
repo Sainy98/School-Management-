@@ -13,7 +13,7 @@ export default function AddSchool() {
         formData.append(key, key === 'image' ? data.image[0] : data[key]);
       });
 
-      await axios.post('/api/addSchool', formData, {
+      await axios.post('https://schools-management.netlify.app/api/addSchool', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
