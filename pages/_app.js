@@ -1,5 +1,5 @@
 
-import '../styles/globals.css';
+import '../Styles/globals.css';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
