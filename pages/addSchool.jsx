@@ -15,6 +15,7 @@ export default function AddSchool() {
 
       await axios.post('https://schools-management.netlify.app/api/addSchool', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 20000 
       });
 
       alert('School added successfully!');
@@ -47,7 +48,7 @@ export default function AddSchool() {
       <input type="email" {...register('email_id', { required: true })} placeholder="Email" />
       {errors.email_id && <span>Email is required</span>}
 
-      <input type="file" {...register('image', { required: true })} />
+      <input type="file" {...register('image', { required: false })} />
       {errors.image && <span>Image is required</span>}
 
       <button type="submit">Add School</button>
