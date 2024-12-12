@@ -1,58 +1,51 @@
 //api/addSchool.js
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+import cloudinary from 'cloudinary';
 import db from './db';
 
-// Set up storage for image upload
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = './public/schoolImages';
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({
-  storage,
-  limits: { fileSize: 1 * 1024 * 1024 }, // 5MB file size limit
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Invalid file type. Only JPG, JPEG, and PNG are allowed'), false);
-    }
-  },
+// Configure Cloudinary
+cloudinary.v2.config({
+  cloud_name: "djgstrn03",
+  api_key: "429649979917489",
+  api_secret: "I9rQ08B5i6QQA4s2fql4RhoQz7U",
 });
 
 export const config = {
   api: {
-    bodyParser: false, // Disabling bodyParser to handle file uploads manually
+    bodyParser: false, // Disable default body parser
   },
 };
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method === 'POST') {
-    upload.single('image')(req, res, async (err) => {
+    const multer = require('multer');
+    const multerUpload = multer().single('image');
+
+    multerUpload(req, res, async (err) => {
       if (err) {
-        console.error('Error during file upload:', err.message);
         return res.status(500).json({ error: 'Image upload failed', details: err.message });
       }
 
       const { name, address, city, state, contact, email_id } = req.body;
-      const image = req.file ? req.file.filename : '';
 
       try {
+        // Upload to Cloudinary
+        const result = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.v2.uploader.upload_stream(
+            { folder: 'schoolImages' },
+            (error, result) => {
+              if (error) reject(new Error('Cloudinary upload failed'));
+              else resolve(result);
+            }
+          );
+          req.file.stream.pipe(uploadStream);
+        });
+        
+
         await db.query(
           'INSERT INTO schools (name, address, city, state, contact, email_id, image) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          [name, address, city, state, contact, email_id, image]
+          [name, address, city, state, contact, email_id, result.secure_url]
         );
+
         res.status(201).json({ message: 'School added successfully' });
       } catch (error) {
         console.error('Database Error:', error);
