@@ -1,1 +1,6 @@
+[build]
+    functions = "pages/api"  # This is where your serverless functions are
+
+[dev]
+    functions = "pages/api"  # During local development, Netlify dev uses this folder
 
