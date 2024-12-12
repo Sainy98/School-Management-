@@ -48,11 +48,11 @@ export default function ShowSchools() {
         <div className="school-grid">
           {filteredSchools.map((school) => (
             <div key={school.id} className="school-card">
-              <img
-                src={`/schoolImages/${school.image}`}
-                alt={school.name}
-                className="school-image"
-              />
+             <img
+  src={school.image}  // Use the full URL
+  alt={school.name}
+  className="school-image"
+/>
               <div className="school-info">
                 <h2 className="school-name">{school.name}</h2>
                 <p className="school-address">{school.address}</p>
