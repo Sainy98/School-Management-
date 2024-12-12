@@ -18,7 +18,18 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 1 * 1024 * 1024 }, // 5MB file size limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPG, JPEG, and PNG are allowed'), false);
+    }
+  },
+});
 
 export const config = {
   api: {
@@ -30,6 +41,7 @@ export default function handler(req, res) {
   if (req.method === 'POST') {
     upload.single('image')(req, res, async (err) => {
       if (err) {
+        console.error('Error during file upload:', err.message);
         return res.status(500).json({ error: 'Image upload failed', details: err.message });
       }
 
