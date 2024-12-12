@@ -1,4 +1,3 @@
-//pages/addSchool.jsx
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
@@ -11,29 +10,29 @@ export default function AddSchool() {
     try {
       setIsSubmitting(true);
       const formData = new FormData();
-      Object.keys(data).forEach(key => {
-        formData.append(key, key === 'image' ? data.image[0] : data[key]);
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, key === 'image' ? value[0] : value);
       });
 
-      await axios.post('https://schools-management.netlify.app/api/addSchool', formData, {
+      await axios.post('/api/addSchool', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 80000 
       });
 
       alert('School added successfully!');
-      reset()
+      reset();
     } catch (error) {
       console.error('Error adding school:', error);
       alert('Failed to add school!');
-    }finally {
-      setIsSubmitting(false); // Reset the button text after submitting (whether success or failure)
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
       <h2>Add School</h2>
-      
+
       <input type="text" {...register('name', { required: true })} placeholder="School Name" />
       {errors.name && <span>Name is required</span>}
 
@@ -56,7 +55,7 @@ export default function AddSchool() {
       {errors.image && <span>Image is required</span>}
 
       <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Adding...' : 'Add School'}  {/* Dynamically change button text */}
+        {isSubmitting ? 'Adding...' : 'Add School'}
       </button>
     </form>
   );
